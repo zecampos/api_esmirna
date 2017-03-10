@@ -1,28 +1,14 @@
 from flask import Flask,jsonify
 
+from Blueprints.membros import membros
+
+
 app = Flask(__name__)
-@app.route("/")
+app.register_blueprint(membros)
+
+@app.route("/", methods=["GET"])
 def hello():
-    return "Helo Wolrd"
-
-@app.route("/membros/<int:id>/",methods=["GET"])
-def getMembros(id):
-    data = {"Mensagem":"Listando Membro com o ID %s"%id}
-    return jsonify(data)
-
-@app.route("/membros",methods=["POST"])
-def postMembros(id):
-    data = {"Mensagem":"Cadastrando Membro"}
-    return jsonify(data)
-
-@app.route("/membros/<int:id>/",methods=["PUT"])
-def editarMembros(id):
-    data = {"Mensagem":"Atualizando Membro com o ID %s"%id }
-    return jsonify(data)
-
-@app.route("/membros/<int:id>/",methods=["DELETE"])
-def deletarMembros(id):
-    data = {"Mensagem" : "Deletando Membro com o ID %s"%id}
+    data = {"Mensagem":"Bem vindo"}
     return jsonify(data)
 
 if __name__ == '__main__':
