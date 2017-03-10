@@ -1,11 +1,15 @@
-from flask import Blueprint,jsonify
+from flask import Blueprint,jsonify,request
+from Model import Membros
+import json
+
+
 
 membros = Blueprint("membros",__name__)
 
-@membros.route("/membros")
+@membros.route("/membros/")
 def list_membros():
-    data = {"Mensagem":"Bem vindo a area de Membros"}
-    return jsonify(data)
+    listar_membros = json.loads(Membros.objects.to_json())
+    return jsonify({"Membros":listar_membros})
 
 @membros.route("/membros/<int:id>/",methods=["GET"])
 def getMembros(id):
@@ -14,8 +18,15 @@ def getMembros(id):
 
 @membros.route("/membros/",methods=["POST"])
 def postMembros():
-    data = {"Mensagem":"Cadastrando Membro"}
-    return jsonify(data)
+    try:
+        dados = request.get_json()
+        m = Membros()
+        for key in dados.keys():
+            setattr(m,key,dados[key])
+        m.save()
+        return jsonify({"Mensagem":"Membro cadastrado com sucesso"})
+    except Exception as e:
+        return jsonify({"Mensagem":"Falhou ao cadastrar membro: %s"%e})
 
 @membros.route("/membros/<int:id>/",methods=["PUT"])
 def editarMembros(id):
