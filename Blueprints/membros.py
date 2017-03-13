@@ -11,9 +11,10 @@ def list_membros():
     listar_membros = json.loads(Membros.objects.to_json())
     return jsonify({"Membros":listar_membros})
 
-@membros.route("/membros/<int:id>/",methods=["GET"])
+@membros.route("/membros/<id>/",methods=["GET"])
 def getMembros(id):
-    data = {"Mensagem":"Listando Membro com o ID %s"%id}
+    m = json.loads(Membros.objects(id=id).to_json())
+    data = {"Membro":m}
     return jsonify(data)
 
 @membros.route("/membros/",methods=["POST"])
@@ -28,12 +29,22 @@ def postMembros():
     except Exception as e:
         return jsonify({"Mensagem":"Falhou ao cadastrar membro: %s"%e})
 
-@membros.route("/membros/<int:id>/",methods=["PUT"])
+@membros.route("/membros/<id>/",methods=["PUT"])
 def editarMembros(id):
-    data = {"Mensagem":"Atualizando Membro com o ID %s"%id }
-    return jsonify(data)
+    try:
+        dados = request.get_json()
+        m = Membros.objects(id=id).first()
+        for key in dados.keys():
+            setattr(m,key,dados[key])
+        m.save()
+        data = {"Mensagem":"Atualizado Membro com o ID %s"%id }
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"mensagem": "Falhou ao atualizar : %s"%e})
 
-@membros.route("/membros/<int:id>/",methods=["DELETE"])
+@membros.route("/membros/<id>/",methods=["DELETE"])
 def deletarMembros(id):
+    m = Membros.objects(id=id)
+    m.delete()
     data = {"Mensagem" : "Deletando Membro com o ID %s"%id}
     return jsonify(data)
